@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="theme-color" content="#0a0a0a"/>
+<title>unrespiro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface2: #1a1a1a;
+    --border: #222;
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.35);
+    --accent: #ffffff;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 3rem 1.5rem 1rem;
+    background: linear-gradient(180deg, #111 0%, var(--bg) 100%);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.2rem;
+  }
+  .logo-icon {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: var(--surface2);
+    border: 1px solid #333;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-ring {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2.5px solid #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #fff;
+  }
+  .logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    letter-spacing: -0.02em;
+  }
+  .tagline {
+    color: var(--muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    font-weight: 300;
+  }
+
+  /* ── Content ── */
+  .content {
+    padding: 0 1.5rem 6rem;
+  }
+
+  /* ── Stats ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 1rem 0.5rem;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .stat-value {
+    font-size: 1.7rem;
+    font-weight: 700;
+    font-family: 'DM Serif Display', serif;
+  }
+  .stat-label {
+    font-size: 0.6rem;
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── Section title ── */
+  .section-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  /* ── Quick block ── */
+  .quick-grid {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+  .quick-btn {
+    flex: 1;
+    padding: 0.8rem 0;
+    background: var(--surface);
+    color: rgba(255,255,255,0.6);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .quick-btn.active {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+  }
+
+  /* ── Apps grid ── */
+  .apps-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .app-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 0.5rem;
+    cursor: pointer;
+    text-align: center;
+    position: relative;
+    transition: all 0.15s;
+    color: white;
+  }
+  .app-btn.blocked { opacity: 0.4; }
+  .app-btn .lock {
+    position: absolute; top: 6px; right: 8px;
+    font-size: 0.55rem;
+  }
+  .app-btn .app-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+  .app-btn .app-name {
+    font-size: 0.62rem;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Toggle ── */
+  .row-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+  }
+  .row-left { display: flex; align-items: center; gap: 0.85rem; }
+  .row-title { font-size: 0.9rem; font-weight: 500; }
+  .row-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+  .toggle {
+    width: 46px; height: 26px;
+    border-radius: 13px;
+    background: var(--surface2);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+    border: none;
+  }
+  .toggle.on { background: #fff; }
+  .toggle::after {
+    content: '';
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #555;
+    position: absolute;
+    top: 3px; left: 3px;
+    transition: left 0.2s, background 0.2s;
+  }
+  .toggle.on::after { left: 23px; background: #000; }
+
+  /* ── Page titles ── */
+  .page-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .page-sub { color: var(--muted); font-size: 0.8rem; margin-bottom: 1.75rem; }
+
+  /* ── Profile ── */
+  .profile-avatar {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--surface2);
+    margin: 0 auto 0.75rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+  }
+  .add-btn {
+    width: 100%;
+    padding: 1rem;
+    background: transparent;
+    border: 1px dashed #2a2a2a;
+    border-radius: 16px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 0.5rem;
+  }
+
+  /* ── Nav ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: rgba(10,10,10,0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid #1a1a1a;
+    display: flex;
+    padding: 0.6rem 0 1.2rem;
+    z-index: 50;
+  }
+  .nav-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--muted);
+    transition: color 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .nav-btn.active { color: #fff; }
+  .nav-icon { font-size: 1.15rem; }
+  .nav-label { font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed;
+    top: 20px; left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 0.6rem 1.4rem;
+    border-radius: 50px;
+    font-size: 0.82rem;
+    z-index: 300;
+    white-space: nowrap;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: transform 0.3s ease;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── Respiro overlay ── */
+  #respiro-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.97);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 2rem;
+    text-align: center;
+  }
+  #respiro-overlay.show { display: flex; }
+
+  .breath-circle {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 2.5rem;
+    transition: width 4s ease-in-out, height 4s ease-in-out,
+                box-shadow 4s ease-in-out;
+  }
+  .breath-circle.inhale {
+    width: 160px; height: 160px;
+    box-shadow: 0 0 60px rgba(255,255,255,0.12), inset 0 0 40px rgba(255,255,255,0.04);
+  }
+  .breath-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.45);
+  }
+  #respiro-app-icon { font-size: 2.5rem; margin-bottom: 0.4rem; }
+  #respiro-app-name {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 1.5rem;
+  }
+  #respiro-frase {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: rgba(255,255,255,0.85);
+    max-width: 280px;
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+  }
+  #respiro-countdown {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 2rem;
+  }
+  #respiro-actions {
+    display: none;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  #respiro-actions.show { display: flex; }
+  .btn-no {
+    padding: 0.75rem 1.75rem;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-si {
+    padding: 0.75rem 1.75rem;
+    border-radius: 50px;
+    border: none;
+    background: white;
+    color: #000;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .respiro-footer {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.18);
+  }
+
+  /* ── Fade in ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .page { animation: fadeUp 0.25s ease; }
+
+  .dimmed { opacity: 0.45; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <div class="logo-ring"><div class="logo-dot"></div></div>
+      </div>
+      <span class="logo-text">unrespiro</span>
+    </div>
+    <p class="tagline">usa el móvil con intención</p>
+  </div>
+
+  <!-- Content -->
+  <div class="content" id="content"></div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="inicio" onclick="switchTab('inicio')">
+      <span class="nav-icon">◎</span>
+      <span class="nav-label">Inicio</span>
+    </button>
+    <button class="nav-btn" data-tab="bloqueos" onclick="switchTab('bloqueos')">
+      <span class="nav-icon">🔒</span>
+      <span class="nav-label">Bloqueos</span>
+    </button>
+    <button class="nav-btn" data-tab="rutinas" onclick="switchTab('rutinas')">
+      <span class="nav-icon">⏰</span>
+      <span class="nav-label">Rutinas</span>
+    </button>
+    <button class="nav-btn" data-tab="perfil" onclick="switchTab('perfil')">
+      <span class="nav-icon">👤</span>
+      <span class="nav-label">Perfil</span>
+    </button>
+  </nav>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Respiro Overlay -->
+<div id="respiro-overlay">
+  <div class="breath-circle" id="breath-circle">
+    <span class="breath-label" id="breath-label">INHALA</span>
+  </div>
+  <div id="respiro-app-icon"></div>
+  <div id="respiro-app-name"></div>
+  <div id="respiro-frase"></div>
+  <div id="respiro-countdown"></div>
+  <div id="respiro-actions">
+    <button class="btn-no" onclick="decidir(false)">No abrir</button>
+    <button class="btn-si" onclick="decidir(true)">Entrar de todas formas</button>
+  </div>
+  <p class="respiro-footer">TÓMATE UN RESPIRO</p>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────
+const state = {
+  tab: 'inicio',
+  bloqueadas: { Instagram: true, TikTok: true, 'Twitter/X': false, YouTube: false, Facebook: false, Reddit: false },
+  rutinas: [
+    { nombre: 'Mañana productiva', hora: '07:00 - 10:00', activa: true },
+    { nombre: 'Hora de trabajo',   hora: '10:00 - 14:00', activa: true },
+    { nombre: 'Tarde enfocada',    hora: '16:00 - 19:00', activa: false },
+    { nombre: 'Noche de descanso', hora: '22:00 - 00:00', activa: false },
+  ],
+  timerActive: null,
+  stats: { hoy: 4, semana: 23, evitados: 8 },
+  currentApp: null,
+};
+
+const APPS = [
+  { name: 'Instagram', icon: '📸' },
+  { name: 'TikTok',    icon: '🎵' },
+  { name: 'Twitter/X', icon: '🐦' },
+  { name: 'YouTube',   icon: '▶️' },
+  { name: 'Facebook',  icon: '👤' },
+  { name: 'Reddit',    icon: '🤖' },
+];
+
+const FRASES = [
+  '¿Realmente necesitas abrir esto ahora?',
+  'Cada segundo cuenta. ¿Es esto lo más importante?',
+  'Tu atención es tu recurso más valioso.',
+  '¿Qué pasaría si no lo abres hoy?',
+  'Respira. ¿Esto te acerca a tus metas?',
+  'El scroll infinito no te hará más feliz.',
+  'Tu tiempo libre merece algo mejor.',
+  '¿Estás abriendo esto por aburrimiento?',
+];
+
+// ── Toast ──────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Navigation ─────────────────────────────────────────────────
+function switchTab(tab) {
+  state.tab = tab;
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  render();
+}
+
+// ── Respiro overlay ────────────────────────────────────────────
+let breathTimer, countTimer, breathPhase = 'inhale';
+
+function openRespiro(app) {
+  if (state.bloqueadas[app.name]) { showToast(`${app.name} está bloqueada 🔒`); return; }
+  state.currentApp = app;
+  state.stats.hoy++;
+
+  document.getElementById('respiro-app-icon').textContent = app.icon;
+  document.getElementById('respiro-app-name').textContent = app.name.toUpperCase();
+  document.getElementById('respiro-frase').textContent =
+    `"${FRASES[Math.floor(Math.random() * FRASES.length)]}"`;
+  document.getElementById('respiro-actions').classList.remove('show');
+
+  // countdown
+  let secs = 5;
+  const cd = document.getElementById('respiro-countdown');
+  cd.style.display = 'flex';
+  cd.textContent = secs;
+  countTimer = setInterval(() => {
+    secs--;
+    if (secs <= 0) {
+      clearInterval(countTimer);
+      cd.style.display = 'none';
+      document.getElementById('respiro-actions').classList.add('show');
+    } else {
+      cd.textContent = secs;
+    }
+  }, 1000);
+
+  // breathing
+  breathPhase = 'inhale';
+  updateBreath();
+  breathTimer = setInterval(() => {
+    breathPhase = breathPhase === 'inhale' ? 'exhale' : 'inhale';
+    updateBreath();
+  }, 4000);
+
+  document.getElementById('respiro-overlay').classList.add('show');
+}
+
+function updateBreath() {
+  const c = document.getElementById('breath-circle');
+  const l = document.getElementById('breath-label');
+  c.className = 'breath-circle ' + breathPhase;
+  l.textContent = breathPhase === 'inhale' ? 'INHALA' : 'EXHALA';
+}
+
+function decidir(entrar) {
+  clearInterval(breathTimer);
+  clearInterval(countTimer);
+  document.getElementById('respiro-overlay').classList.remove('show');
+  if (entrar) showToast(`Abriendo ${state.currentApp?.name}...`);
+  else { showToast('¡Bien hecho! Resististe el impulso 💪'); state.stats.evitados++; }
+  state.currentApp = null;
+  render();
+}
+
+// ── Quick block ────────────────────────────────────────────────
+function activarBloqueo(mins) {
+  if (state.timerActive === mins) { state.timerActive = null; showToast('Modo enfoque desactivado'); render(); return; }
+  state.timerActive = mins;
+  showToast(`Modo enfoque activado por ${mins < 60 ? mins+'min' : (mins/60)+'h'} 🎯`);
+  render();
+  setTimeout(() => { state.timerActive = null; showToast('Modo enfoque terminado ✅'); render(); }, mins * 60 * 1000);
+}
+
+// ── Toggle helpers ─────────────────────────────────────────────
+function toggleBloqueo(name) {
+  state.bloqueadas[name] = !state.bloqueadas[name];
+  showToast(state.bloqueadas[name] ? `${name} bloqueada 🔒` : `${name} desbloqueada`);
+  render();
+}
+
+function toggleRutina(i) {
+  state.rutinas[i].activa = !state.rutinas[i].activa;
+  render();
+}
+
+// ── Render ─────────────────────────────────────────────────────
+function render() {
+  const c = document.getElementById('content');
+  c.innerHTML = '';
+
+  if (state.tab === 'inicio')   c.innerHTML = renderInicio();
+  if (state.tab === 'bloqueos') c.innerHTML = renderBloqueos();
+  if (state.tab === 'rutinas')  c.innerHTML = renderRutinas();
+  if (state.tab === 'perfil')   c.innerHTML = renderPerfil();
+}
+
+function renderInicio() {
+  const { hoy, semana, evitados } = state.stats;
+  const appsHTML = APPS.map(a => `
+    <button class="app-btn ${state.bloqueadas[a.name] ? 'blocked' : ''}"
+            onclick="openRespiro({name:'${a.name}',icon:'${a.icon}'})">
+      ${state.bloqueadas[a.name] ? '<span class="lock">🔒</span>' : ''}
+      <div class="app-icon">${a.icon}</div>
+      <div class="app-name">${a.name.split('/')[0]}</div>
+    </button>`).join('');
+
+  const quickHTML = [15,30,60,120].map(m => `
+    <button class="quick-btn ${state.timerActive===m?'active':''}"
+            onclick="activarBloqueo(${m})">
+      ${m < 60 ? m+'m' : (m/60)+'h'}
+    </button>`).join('');
+
+  return `<div class="page">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value">${hoy}</div><div class="stat-label">Respiros hoy</div></div>
+      <div class="stat-card"><div class="stat-value">${semana}</div><div class="stat-label">Esta semana</div></div>
+      <div class="stat-card"><div class="stat-value">${evitados}</div><div class="stat-label">Evitados</div></div>
+    </div>
+    <p class="section-title">Bloqueo rápido</p>
+    <div class="quick-grid">${quickHTML}</div>
+    <p class="section-title">Abrir app</p>
+    <div class="apps-grid">${appsHTML}</div>
+  </div>`;
+}
+
+function renderBloqueos() {
+  const rows = APPS.map(a => `
+    <div class="row-card">
+      <div class="row-left">
+        <span style="font-size:1.4rem">${a.icon}</span>
+        <div>
+          <div class="row-title">${a.name}</div>
+          <div class="row-sub">${state.bloqueadas[a.name] ? 'Bloqueada' : 'Sin bloqueo'}</div>
+        </div>
+      </div>
+      <button class="toggle ${state.bloqueadas[a.name]?'on':''}"
+              onclick="toggleBloqueo('${a.name}')"></button>
+    </div>`).join('');
+
+  return `<div class="page">
+    <p class="page-title">Bloqueos</p>
+    <p class="page-sub">Activa o desactiva el bloqueo de cada app</p>
+    ${rows}
+    <div class="row-card" style="margin-top:0.5rem;opacity:0.5">
+      <div class="row-left">
+        <span style="font-size:1.2rem">⭐</span>
+        <div class="row-sub">Bloqueos avanzados con Premium</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderRutinas() {
+  const rows = state.rutinas.map((r,i) => `
+    <div class="row-card" style="${!r.activa?'opacity:0.5':''}">
+      <div>
+        <div class="row-title">${r.nombre}</div>
+        <div class="row-sub">${r.hora}</div>
+      </div>
+      <button class="toggle ${r.activa?'on':''}" onclick="toggleRutina(${i})"></button>
+    </div>`).join('');
+
+  return `<div class="page">
+    <p class="page-title">Rutinas</p>
+    <p class="page-sub">Bloqueos automáticos según tu horario</p>
+    ${rows}
+    <button class="add-btn">+ Nueva rutina</button>
+  </div>`;
+}
+
+function renderPerfil() {
+  const items = [
+    { icon:'📊', label:'Mis estadísticas',      sub:'Ver historial completo' },
+    { icon:'🔔', label:'Notificaciones',         sub:'Configura tus alertas' },
+    { icon:'⭐', label:'Premium',                sub:'Desbloquea todas las funciones' },
+    { icon:'📋', label:'Términos y privacidad',  sub:'unrespiroapp.com' },
+  ];
+  const rows = items.map(it => `
+    <div class="row-card" style="cursor:pointer">
+      <div class="row-left">
+        <span style="font-size:1.3rem">${it.icon}</span>
+        <div>
+          <div class="row-title">${it.label}</div>
+          <div class="row-sub">${it.sub}</div>
+        </div>
+      </div>
+      <span style="color:rgba(255,255,255,0.2);font-size:1rem">›</span>
+    </div>`).join('');
+
+  return `<div class="page">
+    <p class="page-title">Perfil</p>
+    <div class="row-card" style="flex-direction:column;text-align:center;margin-bottom:1rem">
+    
